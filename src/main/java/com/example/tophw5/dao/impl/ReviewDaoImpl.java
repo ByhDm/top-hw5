@@ -1,0 +1,87 @@
+package com.example.tophw5.dao.impl;
+
+import com.example.tophw5.dao.ConnectionToDataBase;
+import com.example.tophw5.dao.ReviewDao;
+import com.example.tophw5.entity.Restaurant;
+import com.example.tophw5.entity.Review;
+import org.springframework.stereotype.Repository;
+
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+@Repository
+public class ReviewDaoImpl implements ReviewDao {
+    @Override
+    public Map<String, List<String>> getReviewsRestaurantById(Long id) {
+        String getQuery = "SELECT restaurants.name, reviews.review FROM restaurants, reviews WHERE restaurants.id = ? AND reviews.restaurant_id =?";
+        Restaurant restaurant = new Restaurant();
+        Review review = new Review();
+        Map<String, List<String>> getNameRestaurantWithReviews = new HashMap<>();
+        List<String> reviews = new ArrayList<>();
+        try (PreparedStatement preparedStatement = ConnectionToDataBase.getConnectionDB().prepareStatement(getQuery)) {
+            preparedStatement.setLong(1, id);
+            preparedStatement.setLong(2, id);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            while (resultSet.next()) {
+                restaurant.setName(resultSet.getString(1));
+                review.setReview(resultSet.getString(2));
+                reviews.add(review.getReview());
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        getNameRestaurantWithReviews.put(restaurant.getName(), reviews);
+        return getNameRestaurantWithReviews;
+    }
+
+    @Override
+    public Map<String, Integer> getRatingRestaurantById(Long id) {
+        String getQuery = "SELECT restaurants.name, reviews.rating FROM restaurants, reviews WHERE restaurants.id = ? AND reviews.restaurant_id =?";
+        Restaurant restaurant = new Restaurant();
+        Review review = new Review();
+        Map<String, Integer> getNameRestaurantWithRating = new HashMap<>();
+        try (PreparedStatement preparedStatement = ConnectionToDataBase.getConnectionDB().prepareStatement(getQuery)) {
+            preparedStatement.setLong(1, id);
+            preparedStatement.setLong(2, id);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            while (resultSet.next()) {
+                restaurant.setName(resultSet.getString(1));
+                review.setRating(resultSet.getInt(2));
+                String nameRestaurant = restaurant.getName();
+                Integer ratingRestaurant = review.getRating();
+                getNameRestaurantWithRating.put(nameRestaurant, ratingRestaurant);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return getNameRestaurantWithRating;
+    }
+
+    @Override
+    public void addReview(Review review) {
+        String getQuery = "INSERT INTO reviews (restaurant_id, review, rating) VALUES (?, ?, ?)";
+        try (PreparedStatement preparedStatement = ConnectionToDataBase.getConnectionDB().prepareStatement(getQuery)) {
+            preparedStatement.setLong(1, review.getRestaurant_id());
+            preparedStatement.setString(2, review.getReview());
+            preparedStatement.setInt(3, review.getRating());
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void updateReviewById(Long restaurant_id, String review) {
+        String getQuery = "UPDATE reviews SET review = ? WHERE restaurant_id = ?";
+        try (PreparedStatement preparedStatement = ConnectionToDataBase.getConnectionDB().prepareStatement(getQuery)) {
+            preparedStatement.setString(1, review);
+            preparedStatement.setLong(2, restaurant_id);
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+}
