@@ -17,7 +17,7 @@ import java.util.Map;
 @Repository
 public class ReviewDaoImpl implements ReviewDao {
 
-    private static final Logger logger = LoggerFactory.getLogger(RestaurantDaoImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(ReviewDaoImpl.class);
 
     @Override
     public Map<String, List<String>> getReviewsRestaurantById(Long id) {
