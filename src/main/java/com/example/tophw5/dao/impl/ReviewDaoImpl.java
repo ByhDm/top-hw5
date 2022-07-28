@@ -4,6 +4,8 @@ import com.example.tophw5.dao.ConnectionToDataBase;
 import com.example.tophw5.dao.ReviewDao;
 import com.example.tophw5.entity.Restaurant;
 import com.example.tophw5.entity.Review;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 
 import java.sql.*;
@@ -14,6 +16,9 @@ import java.util.Map;
 
 @Repository
 public class ReviewDaoImpl implements ReviewDao {
+
+    private static final Logger logger = LoggerFactory.getLogger(RestaurantDaoImpl.class);
+
     @Override
     public Map<String, List<String>> getReviewsRestaurantById(Long id) {
         String getQuery = "SELECT restaurants.name, reviews.review FROM restaurants, reviews WHERE restaurants.id = ? AND reviews.restaurant_id =?";
@@ -31,7 +36,10 @@ public class ReviewDaoImpl implements ReviewDao {
                 reviews.add(review.getReview());
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Incorrect getQuery '{}' or id '{}'"
+                    , getQuery
+                    , id
+                    , e);
         }
         getNameRestaurantWithReviews.put(restaurant.getName(), reviews);
         return getNameRestaurantWithReviews;
@@ -55,7 +63,10 @@ public class ReviewDaoImpl implements ReviewDao {
                 getNameRestaurantWithRating.put(nameRestaurant, ratingRestaurant);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Incorrect getQuery '{}' or id '{}'"
+                    , getQuery
+                    , id
+                    , e);
         }
         return getNameRestaurantWithRating;
     }
@@ -69,7 +80,13 @@ public class ReviewDaoImpl implements ReviewDao {
             preparedStatement.setInt(3, review.getRating());
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Incorrect getQuery '{}' " +
+                    "or fields object review - restaurant_id '{}' or review '{}' or rating '{}'"
+                    , getQuery
+                    , review.getRestaurant_id()
+                    , review.getReview()
+                    , review.getRating()
+                    , e);
         }
     }
 
@@ -81,7 +98,11 @@ public class ReviewDaoImpl implements ReviewDao {
             preparedStatement.setLong(2, restaurant_id);
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Incorrect getQuery '{}' or restaurant_id '{}' or review '{}'"
+                    , getQuery
+                    , restaurant_id
+                    , review
+                    , e);
         }
     }
 }

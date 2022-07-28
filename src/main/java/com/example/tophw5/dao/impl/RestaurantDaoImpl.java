@@ -3,6 +3,8 @@ package com.example.tophw5.dao.impl;
 import com.example.tophw5.dao.ConnectionToDataBase;
 import com.example.tophw5.dao.RestaurantDao;
 import com.example.tophw5.entity.Restaurant;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 
 import java.sql.*;
@@ -11,6 +13,8 @@ import java.util.List;
 
 @Repository
 public class RestaurantDaoImpl implements RestaurantDao {
+
+    private static final Logger logger = LoggerFactory.getLogger(RestaurantDaoImpl.class);
 
     @Override
     public List<Restaurant> getAllRestaurants() {
@@ -28,7 +32,9 @@ public class RestaurantDaoImpl implements RestaurantDao {
                 restaurants.add(restaurant);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Incorrect getQuery '{}'"
+                    , getQuery
+                    , e);
         }
         return restaurants;
     }
@@ -43,7 +49,14 @@ public class RestaurantDaoImpl implements RestaurantDao {
             preparedStatement.setString(4, restaurant.getDescription());
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Incorrect getQuery '{}'" +
+                    " or fields object restaurant - name '{}' or phoneNumber '{}' or email '{}' or description '{}'"
+                    , getQuery
+                    , restaurant.getName()
+                    , restaurant.getPhoneNumber()
+                    , restaurant.getEmail()
+                    , restaurant.getDescription()
+                    , e);
         }
     }
 
@@ -62,7 +75,10 @@ public class RestaurantDaoImpl implements RestaurantDao {
                 restaurant.setDescription(resultSet.getString(5));
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Incorrect getQuery '{}' or name '{}'"
+                    , getQuery
+                    , name
+                    , e);
         }
         return restaurant;
     }
@@ -75,7 +91,11 @@ public class RestaurantDaoImpl implements RestaurantDao {
             preparedStatement.setString(2, name);
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Incorrect getQuery '{}' or name '{}' or description '{}'"
+                    , getQuery
+                    , name
+                    , description
+                    , e);
         }
     }
 
@@ -88,7 +108,10 @@ public class RestaurantDaoImpl implements RestaurantDao {
             resultSet.next();
             return resultSet.getString("description");
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Incorrect getQuery '{}' or name '{}'"
+                    , getQuery
+                    , name
+                    , e);
         }
         return null;
     }
@@ -108,7 +131,10 @@ public class RestaurantDaoImpl implements RestaurantDao {
                 restaurant.setDescription(resultSet.getString(5));
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.error("Incorrect getQuery '{}' or id '{}'"
+                    , getQuery
+                    , id
+                    , e);
         }
         return restaurant;
     }
