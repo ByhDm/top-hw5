@@ -11,7 +11,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-import static com.example.tophw5.config.DataBaseConnectionProperties.DATABASE_URL;
+import static com.example.tophw5.config.DataBaseConnectionProperties.url;
 
 @Component
 public class ConnectionToDataBase {
@@ -23,10 +23,10 @@ public class ConnectionToDataBase {
     @PostConstruct
     public void initialize() {
         try {
-            connection = DriverManager.getConnection(DATABASE_URL, DataBaseConnectionProperties.getConnectionProps());
+            connection = DriverManager.getConnection(url, DataBaseConnectionProperties.getConnectionProps());
         } catch (SQLException e) {
             logger.debug("Incorrect dataBaseURL '{}' or connection properties '{}'"
-                    , DATABASE_URL
+                    , url
                     , DataBaseConnectionProperties.getConnectionProps()
                     , e);
         }
