@@ -1,6 +1,5 @@
 package com.example.tophw5.dao.impl;
 
-import com.example.tophw5.dao.ConnectionToDataBase;
 import com.example.tophw5.dao.ReviewDao;
 import com.example.tophw5.entity.Restaurant;
 import com.example.tophw5.entity.Review;
