@@ -14,6 +14,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.example.tophw5.dao.ConnectionToDataBase.connection;
+
 @Repository
 public class ReviewDaoImpl implements ReviewDao {
 
@@ -26,7 +28,7 @@ public class ReviewDaoImpl implements ReviewDao {
         Review review = new Review();
         Map<String, List<String>> getNameRestaurantWithReviews = new HashMap<>();
         List<String> reviews = new ArrayList<>();
-        try (PreparedStatement preparedStatement = ConnectionToDataBase.getConnectionDB().prepareStatement(getQuery)) {
+        try (PreparedStatement preparedStatement = connection.prepareStatement(getQuery)) {
             preparedStatement.setLong(1, id);
             preparedStatement.setLong(2, id);
             ResultSet resultSet = preparedStatement.executeQuery();
@@ -36,7 +38,7 @@ public class ReviewDaoImpl implements ReviewDao {
                 reviews.add(review.getReview());
             }
         } catch (SQLException e) {
-            logger.error("Incorrect getQuery '{}' or id '{}'"
+            logger.debug("Incorrect getQuery '{}' or id '{}'"
                     , getQuery
                     , id
                     , e);
@@ -51,7 +53,7 @@ public class ReviewDaoImpl implements ReviewDao {
         Restaurant restaurant = new Restaurant();
         Review review = new Review();
         Map<String, Integer> getNameRestaurantWithRating = new HashMap<>();
-        try (PreparedStatement preparedStatement = ConnectionToDataBase.getConnectionDB().prepareStatement(getQuery)) {
+        try (PreparedStatement preparedStatement = connection.prepareStatement(getQuery)) {
             preparedStatement.setLong(1, id);
             preparedStatement.setLong(2, id);
             ResultSet resultSet = preparedStatement.executeQuery();
@@ -63,7 +65,7 @@ public class ReviewDaoImpl implements ReviewDao {
                 getNameRestaurantWithRating.put(nameRestaurant, ratingRestaurant);
             }
         } catch (SQLException e) {
-            logger.error("Incorrect getQuery '{}' or id '{}'"
+            logger.debug("Incorrect getQuery '{}' or id '{}'"
                     , getQuery
                     , id
                     , e);
@@ -74,13 +76,13 @@ public class ReviewDaoImpl implements ReviewDao {
     @Override
     public void addReview(Review review) {
         String getQuery = "INSERT INTO reviews (restaurant_id, review, rating) VALUES (?, ?, ?)";
-        try (PreparedStatement preparedStatement = ConnectionToDataBase.getConnectionDB().prepareStatement(getQuery)) {
+        try (PreparedStatement preparedStatement = connection.prepareStatement(getQuery)) {
             preparedStatement.setLong(1, review.getRestaurant_id());
             preparedStatement.setString(2, review.getReview());
             preparedStatement.setInt(3, review.getRating());
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
-            logger.error("Incorrect getQuery '{}' " +
+            logger.debug("Incorrect getQuery '{}' " +
                     "or fields object review - restaurant_id '{}' or review '{}' or rating '{}'"
                     , getQuery
                     , review.getRestaurant_id()
@@ -93,12 +95,12 @@ public class ReviewDaoImpl implements ReviewDao {
     @Override
     public void updateReviewById(Long restaurant_id, String review) {
         String getQuery = "UPDATE reviews SET review = ? WHERE restaurant_id = ?";
-        try (PreparedStatement preparedStatement = ConnectionToDataBase.getConnectionDB().prepareStatement(getQuery)) {
+        try (PreparedStatement preparedStatement = connection.prepareStatement(getQuery)) {
             preparedStatement.setString(1, review);
             preparedStatement.setLong(2, restaurant_id);
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
-            logger.error("Incorrect getQuery '{}' or restaurant_id '{}' or review '{}'"
+            logger.debug("Incorrect getQuery '{}' or restaurant_id '{}' or review '{}'"
                     , getQuery
                     , restaurant_id
                     , review
