@@ -30,6 +30,7 @@ public class RestaurantDaoImpl implements RestaurantDao {
                 restaurant.setPhoneNumber(resultSet.getString(3));
                 restaurant.setEmail(resultSet.getString(4));
                 restaurant.setDescription(resultSet.getString(5));
+                restaurant.setCreationDate(resultSet.getDate(6).toLocalDate());
                 restaurants.add(restaurant);
             }
         } catch (SQLException e) {
@@ -41,13 +42,14 @@ public class RestaurantDaoImpl implements RestaurantDao {
     }
 
     @Override
-    public void addRestaurant(Restaurant restaurant) {
-        String getQuery = "INSERT INTO restaurants (name, phoneNumber, email, description) VALUES (?, ?, ?, ?)";
+    public Restaurant addRestaurant(Restaurant restaurant) {
+        String getQuery = "INSERT INTO restaurants (name, phoneNumber, email, description) VALUES (?, ?, ?, ?, ?)";
         try (PreparedStatement preparedStatement = connection.prepareStatement(getQuery)) {
             preparedStatement.setString(1, restaurant.getName());
             preparedStatement.setString(2, restaurant.getPhoneNumber());
             preparedStatement.setString(3, restaurant.getEmail());
             preparedStatement.setString(4, restaurant.getDescription());
+            preparedStatement.setDate(5, Date.valueOf(restaurant.getCreationDate()));
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
             logger.debug("Incorrect getQuery '{}'" +
@@ -59,6 +61,7 @@ public class RestaurantDaoImpl implements RestaurantDao {
                     , restaurant.getDescription()
                     , e);
         }
+        return restaurant;
     }
 
     @Override
@@ -74,6 +77,7 @@ public class RestaurantDaoImpl implements RestaurantDao {
                 restaurant.setPhoneNumber(resultSet.getString(3));
                 restaurant.setEmail(resultSet.getString(4));
                 restaurant.setDescription(resultSet.getString(5));
+                restaurant.setCreationDate(resultSet.getDate(6).toLocalDate());
             }
         } catch (SQLException e) {
             logger.debug("Incorrect getQuery '{}' or name '{}'"
@@ -130,6 +134,7 @@ public class RestaurantDaoImpl implements RestaurantDao {
                 restaurant.setPhoneNumber(resultSet.getString(3));
                 restaurant.setEmail(resultSet.getString(4));
                 restaurant.setDescription(resultSet.getString(5));
+                restaurant.setCreationDate(resultSet.getDate(6).toLocalDate());
             }
         } catch (SQLException e) {
             logger.debug("Incorrect getQuery '{}' or id '{}'"

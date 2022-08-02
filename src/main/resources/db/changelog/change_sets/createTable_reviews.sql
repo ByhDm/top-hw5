@@ -1,4 +1,3 @@
-drop table if exists reviews;
 create table if not exists reviews
 (
     id            bigint auto_increment primary key,

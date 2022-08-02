@@ -1,6 +1,8 @@
 package com.example.tophw5.controller;
 
+import com.example.tophw5.dto.out.RestaurantOutDTO;
 import com.example.tophw5.entity.Restaurant;
+import com.example.tophw5.mapper.RestaurantMapper;
 import com.example.tophw5.service.RestaurantService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -14,6 +16,9 @@ public class RestaurantController {
     @Autowired
     private RestaurantService restaurantService;
 
+    @Autowired
+    private RestaurantMapper restaurantMapper;
+
     @GetMapping("/all")
     public List<Restaurant> getAllRestaurants() {
         return restaurantService.getAllRestaurants();
@@ -25,8 +30,9 @@ public class RestaurantController {
     }
 
     @GetMapping("/name/{name}")
-    public Restaurant getRestaurantByName(@PathVariable String name) {
-        return restaurantService.getRestaurantByName(name);
+    public RestaurantOutDTO getRestaurantByName(@PathVariable String name) {
+        Restaurant restaurant = restaurantService.getRestaurantByName(name);
+        return restaurantMapper.restaurantToRestaurantOutDTO(restaurant);
     }
 
     @PutMapping("/update/{name}/{description}")
