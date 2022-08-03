@@ -1,6 +1,7 @@
 package com.example.tophw5.controller;
 
 import com.example.tophw5.entity.Review;
+import com.example.tophw5.mapper.ReviewMapper;
 import com.example.tophw5.service.ReviewService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -15,9 +16,13 @@ public class ReviewController {
     @Autowired
     private ReviewService reviewService;
 
+    @Autowired
+    private ReviewMapper reviewMapper;
+
     @GetMapping("/{id}")
     public Map<String, List<String>> getReviewsRestaurantById(@PathVariable Long id) {
-        return reviewService.getReviewsRestaurantById(id);
+        Map<String, List<String>> reviewsRestaurantById = reviewService.getReviewsRestaurantById(id);
+        return reviewMapper.reviewsToReviewsOutDTO(reviewsRestaurantById);
     }
 
     @GetMapping("/rating/{id}")

@@ -1,7 +1,9 @@
 package com.example.tophw5.dao;
 
 import com.example.tophw5.entity.Restaurant;
+import com.example.tophw5.exception.FoundationDateIsExpiredException;
 
+import java.time.LocalDate;
 import java.util.List;
 
 public interface RestaurantDao {

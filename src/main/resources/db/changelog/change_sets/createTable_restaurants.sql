@@ -5,7 +5,7 @@ create table if not exists restaurants
     phoneNumber varchar(15) not null,
     email       varchar(30) not null,
     description varchar(255),
-    creationDate date
+    creationDate date not null default '2000-01-01'
 );
 
 insert into restaurants (name, phoneNumber, email, description, creationDate)

@@ -16,7 +16,7 @@ public class RestaurantOutDTO {
     private Long id;
     private String name;
     private String phoneNumber;
-    private String emailAddress;
+    private String email;
     private String description;
 
     @JsonSerialize(using = LocalDateSerializer.class)

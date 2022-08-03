@@ -4,6 +4,7 @@ import com.example.tophw5.dao.RestaurantDao;
 import com.example.tophw5.entity.Restaurant;
 import com.example.tophw5.exception.FoundationDateIsExpiredException;
 import com.example.tophw5.exception.IncorrectEmailAddressException;
+import com.example.tophw5.exception.RestaurantNotFoundException;
 import com.example.tophw5.service.RestaurantService;
 import com.example.tophw5.util.EmailUtil;
 import com.example.tophw5.util.PhoneUtil;
@@ -60,9 +61,10 @@ public class RestaurantServiceImpl implements RestaurantService {
     }
 
     @Override
-    public Restaurant getRestaurantById(Long id) {
-
-        return restaurantDao.getRestaurantById(id);
+    public Restaurant getRestaurantById(Long id) throws RestaurantNotFoundException {
+        Restaurant restaurant = restaurantDao.getRestaurantById(id);
+        if (restaurant.getId() == null) throw new RestaurantNotFoundException();
+        return restaurant;
     }
 
     @Override
@@ -92,22 +94,22 @@ public class RestaurantServiceImpl implements RestaurantService {
     }
 
     @Override
-    public Long addRestaurantByNameAndCreationDate(String name, LocalDate creationDate) throws FoundationDateIsExpiredException {
+    public Restaurant addRestaurantByNameAndCreationDate(String name, LocalDate creationDate) throws FoundationDateIsExpiredException {
         LocalDate dateNow = LocalDate.now();
-        if (creationDate == null || dateNow.isAfter(creationDate)) {
+        if (creationDate == null || dateNow.isBefore(creationDate)) {
             throw new FoundationDateIsExpiredException(name, creationDate);
         }
         Restaurant restaurant = new Restaurant();
         restaurant.setName(name);
-        restaurant.setCreationDate(creationDate);
-        Restaurant restaurantSave = restaurantDao.addRestaurant(restaurant);
-        return restaurantSave.getId();
+        restaurant.setDate(creationDate);
+        Restaurant restaurantSave = addRestaurant(restaurant);
+        return restaurantSave;
 
     }
 
     @Override
     public LocalDate getCreationDateByRestaurantId(Long id) {
         Restaurant restaurantById = restaurantDao.getRestaurantById(id);
-        return restaurantById.getCreationDate();
+        return restaurantById.getDate();
     }
 }

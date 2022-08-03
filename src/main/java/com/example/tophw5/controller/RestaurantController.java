@@ -2,12 +2,19 @@ package com.example.tophw5.controller;
 
 import com.example.tophw5.dto.out.RestaurantOutDTO;
 import com.example.tophw5.entity.Restaurant;
+import com.example.tophw5.exception.RestaurantNotFoundException;
 import com.example.tophw5.mapper.RestaurantMapper;
 import com.example.tophw5.service.RestaurantService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/restaurant")
@@ -20,12 +27,13 @@ public class RestaurantController {
     private RestaurantMapper restaurantMapper;
 
     @GetMapping("/all")
-    public List<Restaurant> getAllRestaurants() {
-        return restaurantService.getAllRestaurants();
+    public List<RestaurantOutDTO> getAllRestaurants() {
+        List<Restaurant> restaurants = restaurantService.getAllRestaurants();
+        return restaurantMapper.restaurantsToRestaurantsOutDTO(restaurants);
     }
 
     @PostMapping("/add")
-    public void addRestaurant(@RequestBody Restaurant restaurant) {
+    public void addRestaurant(@RequestBody @Valid Restaurant restaurant) {
         restaurantService.addRestaurant(restaurant);
     }
 
@@ -42,11 +50,28 @@ public class RestaurantController {
 
     @GetMapping("/description/{name}")
     public String getDescriptionRestaurantByName(@PathVariable String name) {
-        return restaurantService.getDescriptionRestaurantByName(name);
+        Restaurant restaurant = restaurantService.getRestaurantByName(name);
+        return restaurantMapper.restaurantToRestaurantOutDTO(restaurant).getDescription();
     }
 
     @GetMapping("/id/{id}")
-    public Restaurant getRestaurantById(@PathVariable Long id) {
-        return restaurantService.getRestaurantById(id);
+    public RestaurantOutDTO getRestaurantById(@PathVariable Long id) throws RestaurantNotFoundException {
+        Restaurant restaurant = restaurantService.getRestaurantById(id);
+        return restaurantMapper.restaurantToRestaurantOutDTO(restaurant);
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public Map<String, String> handleValidationExceptions(
+            MethodArgumentNotValidException ex) {
+        System.out.println("Stop");
+
+        Map<String, String> errors = new HashMap<>();
+        ex.getBindingResult().getAllErrors().forEach((error) -> {
+            String fieldName = ((FieldError) error).getField();
+            String errorMessage = error.getDefaultMessage();
+            errors.put(fieldName, errorMessage);
+        });
+        return errors;
     }
 }

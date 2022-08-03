@@ -4,9 +4,10 @@ package com.example.tophw5.service;
 import com.example.tophw5.TopHw5ApplicationTests;
 import com.example.tophw5.dao.RestaurantDao;
 import com.example.tophw5.entity.Restaurant;
+import com.example.tophw5.entity.Review;
 import com.example.tophw5.exception.FoundationDateIsExpiredException;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
+import com.example.tophw5.exception.RestaurantNotFoundException;
+import org.junit.jupiter.api.*;
 import org.mockito.MockedStatic;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -16,7 +17,9 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Answers.CALLS_REAL_METHODS;
 import static org.mockito.Mockito.mockStatic;
 
-class RestaurantServiceTest extends TopHw5ApplicationTests {
+
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+public class RestaurantServiceTest extends TopHw5ApplicationTests {
 
     @Autowired
     private RestaurantService restaurantService;
@@ -24,33 +27,23 @@ class RestaurantServiceTest extends TopHw5ApplicationTests {
     @Autowired
     private ReviewService reviewService;
 
-    @Autowired
-    private RestaurantDao restaurantDao;
-
-/*    @BeforeAll
+    @BeforeAll
     void addRestaurantsAndReviewsInDataBase() {
         Restaurant restaurant = new Restaurant();
-        restaurant.setName("Astoria");
-        restaurant.setDescription("Test description 1");
+        restaurant.setName("TestRestaurant");
+        restaurant.setDescription("Test description new");
         restaurantService.addRestaurant(restaurant);
         Review review = new Review();
         review.setReview("Good restaurant");
         review.setRestaurant_id(restaurantService.getAllRestaurants().get(0).getId());
-        review.setRating(3);
+        review.setRating(4);
         reviewService.addReview(review);
-    }*/
-
-//    @BeforeEach
-//    void setDefaultParameters() {
-//        restaurantService.addPhoneByRestaurantName("Astoria", "+79998888888");
-//    }
-
-/*
-    @AfterAll
-    void cleanTable() {
-
     }
-*/
+
+    @BeforeEach
+    void setDefaultParameters() {
+        restaurantService.addPhoneByRestaurantName("TestRestaurant", "+79990000000");
+    }
 
     @Test
     void getAll() {
@@ -60,20 +53,6 @@ class RestaurantServiceTest extends TopHw5ApplicationTests {
         assertEquals("astoria@astoria.com", restaurantService.getAllRestaurants().get(0).getEmail());
         assertEquals("Test description 1", restaurantService.getAllRestaurants().get(0).getDescription());
     }
-
-/*
-    @Test
-    void addRestaurant() {
-        String name = "Asia";
-        String phoneNumber = "+76666666666";
-        String email = "asia@asia.com";
-        String description = "Test description 5";
-        LocalDate date = ;
-        Restaurant restaurant = new Restaurant(name, phoneNumber, email, description, date);
-        restaurantService.addRestaurant(restaurant);
-        assertEquals(restaurant, restaurantService.getRestaurantByName("Astoria"));
-    }
-*/
 
     @Test
     void getRestaurantByName() {
@@ -98,7 +77,7 @@ class RestaurantServiceTest extends TopHw5ApplicationTests {
     }
 
     @Test
-    void getRestaurantById() {
+    void getRestaurantById() throws RestaurantNotFoundException {
         Long id = 3L;
         Restaurant restaurantById = restaurantService.getRestaurantById(id);
         assertEquals(id, restaurantById.getId());
@@ -121,16 +100,13 @@ class RestaurantServiceTest extends TopHw5ApplicationTests {
     @Test
     void addRestaurantByNameAndCreationDate() throws FoundationDateIsExpiredException {
         MockedStatic<LocalDate> localDateMockedStatic = mockStatic(LocalDate.class, CALLS_REAL_METHODS);
-        LocalDate defaultDateNow = LocalDate.of(2012, 07, 30);
+        LocalDate defaultDateNow = LocalDate.of(2015, 4, 17);
         localDateMockedStatic.when(LocalDate::now).thenReturn(defaultDateNow);
 
         Assertions.assertThrowsExactly(FoundationDateIsExpiredException.class,
-                () -> restaurantService.addRestaurantByNameAndCreationDate("Astoria", LocalDate.of(2015, 12, 12)),
-                "Restaurant with name \"" + "Astoria" + "\"" +
-                        "has foundation date " + LocalDate.now().plusDays(2));
+                () -> restaurantService.addRestaurantByNameAndCreationDate("Astoria", LocalDate.of(2016, 4, 17)));
 
-        Long test = restaurantService.addRestaurantByNameAndCreationDate("Astoria", LocalDate.of(2015, 4, 17));
-        LocalDate localDateExpected = restaurantService.getCreationDateByRestaurantId(test);
-        assertEquals(LocalDate.of(2015, 4, 17), localDateExpected);
+        restaurantService.addRestaurantByNameAndCreationDate("Astoria", LocalDate.of(2015, 4, 17));
+        assertEquals(LocalDate.of(2015, 4, 17), restaurantService.getCreationDateByRestaurantId(1L));
     }
 }
